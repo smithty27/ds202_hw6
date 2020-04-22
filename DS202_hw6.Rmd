@@ -1,0 +1,55 @@
+---
+title: "Homework 6"
+author: "Tyler Smith"
+date: "April 15, 2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+```{r}
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+#Problem 1 - Import and  Clean
+best <- readxl::read_xlsx("KIB.xlsx",sheet='Best in show')
+full <- readxl::read_xlsx("KIB.xlsx",sheet='Best in show full sheet')
+
+best <- best[,-c(2:4)]
+colnames(best) <- best[5,]
+best <- best[-c(1:6),]
+best <- best[,c(1,2,4,6,7,43)]
+colnames(best) <- c("breed","type","popular","intel_score","intel","size")
+
+
+colnames(full) <- full[2,]
+full <- full[,c(1,3,5,30,32,41)]
+full <- full[-c(1:3),]
+colnames(full) <- c("breed","type","score","popular","size","intel")
+full$score <- as.numeric(full$score)
+full$popular <- as.numeric(full$popular)
+head(best)
+
+full$size2 <- as.factor(full$size)
+levels(full$size2) <- c(3,2,1)
+full$size2 <- as.numeric(full$size2)
+full$intel2 <- as.factor(full$intel)
+levels(full$intel2) <- c("Intelligent","Not Intelligent","Intelligent","Intelligent","Not Intelligent", "Not Intelligent","Not Intelligent")
+```
+
+# Problem 2  
+
+```{r, fig.height = 6, fig.width = 13}
+full %>% 
+  ggplot(aes(x=score,y=-popular,color=type, shape=intel2))+geom_point(aes(size=size2/2))+labs(x="Data Score",y="Popularity",title="Best In Show: Ultimate Dog Data",size="Size of Dog",shape="Intelligent",color="Type of Dog") + 
+  scale_size_continuous(breaks=c(.5,1,1.5), labels=c("Small","Medium","Large")) +
+  geom_text(aes(label=breed),nudge_y=-3)
+
+```
+
